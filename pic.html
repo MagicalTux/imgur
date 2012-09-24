@@ -26,8 +26,8 @@ imgObject.onload = function() {
 		return;
 	}
 	document.getElementById("cache").innerHTML = foundimgs.length;
-	// if less than 10 imgs in cache, search for more
-	if (foundimgs.length < 10)
+	// if less than 25 imgs in cache, search for more
+	if (foundimgs.length < 25)
 		getImages();
 };
 
@@ -57,7 +57,7 @@ function img_next() {
 	historyimgs.push(img_data);
 	img_show(img_data);
 	document.getElementById("cache").innerHTML = foundimgs.length;
-	if (foundimgs.length < 10)
+	if (foundimgs.length < 25)
 		getImages();
 }
 
