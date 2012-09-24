@@ -31,6 +31,8 @@ imgObject.onload = function() {
 		getImages();
 };
 
+imgObject.onerror = function() { img_loading = false; getImages(); };
+
 function randomString(string_length) {
 	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghiklmnopqrstuvwxyz";
 	var output = "";
