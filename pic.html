@@ -1,98 +1,139 @@
 ﻿<html>
-<head>
-<title>Random imgur image</title>
-<style type="text/css">
-img { max-width: 100%; height: auto; }
-</style>
-<script language="javascript" type="text/javascript">
-var foundimgs = [];
-var historyimgs = [];
-var imgObject = new Image();
-var numTries = 1;
-var img_loading = false;
+	<head>
+		<title>Random imgur image</title>
+		<style type="text/css">
+			img {
+				max-width: 100%;
+				height: auto;
+			}
 
-imgObject.onload = function() {
-	if (this.width == 161 && this.height == 81) {
-		this.src = "http://i.imgur.com/" + randomString(5) + ".jpg";
-		numTries++;
-		return;
-	}
-	foundimgs.push([numTries, this.src]);
-	numTries = 1;
-	img_loading = false;
-	if (historyimgs.length == 0) {
-		img_next();
-		// img_next() will cause loading of another img
-		return;
-	}
-	document.getElementById("cache").innerHTML = foundimgs.length;
-	// if less than 25 imgs in cache, search for more
-	if (foundimgs.length < 25)
-		getImages();
-};
+			#topbar {
+				width: 100%;
+			}
 
-imgObject.onerror = function() { img_loading = false; getImages(); };
+			#link {
+				display: inline;
+			}
 
-function randomString(string_length) {
-	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghiklmnopqrstuvwxyz";
-	var output = "";
-	var index;
+			#title {
+				float: left;
+				padding-right: 15px;
+				font-weight: bold;
+			}
 
-	for (var i = 0; i < string_length; i++) {
-		var index = Math.floor(Math.random() * chars.length);
-		output += chars.substring(index, index + 1);
-	}
+			#rightbar {
+				float: right;
+			}
 
-	return output;
-}
+			#input_max_cache {
+				width: 3em;
+			}
+		</style>
+		<script language="javascript" type="text/javascript">
+			var foundimgs = [];
+			var historyimgs = [];
+			var imgObject = new Image();
+			var numTries = 1;
+			var img_loading = false;
+			var cache_length = 25;
 
-function getImages() {
-	if (img_loading) return;
-	img_loading = true;
-	imgObject.src = "http://i.imgur.com/" + randomString(5) + ".jpg";
-}
+			imgObject.onload = function() {
+				if (this.width == 161 && this.height == 81) {
+					this.src = "http://i.imgur.com/" + randomString(5) + ".jpg";
+					numTries++;
+					return;
+				}
+				foundimgs.push([numTries, this.src]);
+				numTries = 1;
+				img_loading = false;
+				if (historyimgs.length == 0) {
+					img_next();
+					// img_next() will cause loading of another img
+					return;
+				}
+				document.getElementById("cache").innerHTML = foundimgs.length;
+				// if less than cache_length, search for more
+				if (foundimgs.length < cache_length)
+					getImages();
+			};
 
-function img_next() {
-	// load next image
-	if (foundimgs.length == 0) return;
-	var img_data = foundimgs.shift();
-	historyimgs.push(img_data);
-	img_show(img_data);
-	document.getElementById("cache").innerHTML = foundimgs.length;
-	if (foundimgs.length < 25)
-		getImages();
-}
+			imgObject.onerror = function() { img_loading = false; getImages(); };
 
-function img_prev() {
-	// go one image back
-	if (historyimgs.length <= 1) return; // Can't go back
-	foundimgs.unshift(historyimgs.pop());
-	document.getElementById("cache").innerHTML = foundimgs.length;
-	img_show(historyimgs[historyimgs.length - 1]);
-}
+			function randomString(string_length) {
+				var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghiklmnopqrstuvwxyz";
+				var output = "";
+				var index;
 
-function img_show(data) {
-	var html = "It took "+data[0]+" to get this picture. ";
-	if (historyimgs.length > 1)
-		html += "<a href=\"javascript:img_prev();\">Prev img</a> ";
-	html += "<a href=\"javascript:img_next();\">Next img</a><br/><br/>";
-	html += "<a href=\"" + data[1] + "\">" + data[1] + "<br/><img src=\"" + data[1] + "\" /></a>";
-	document.getElementById('a').innerHTML = html;
-}
+				for (var i = 0; i < string_length; i++) {
+					var index = Math.floor(Math.random() * chars.length);
+					output += chars.substring(index, index + 1);
+				}
 
-document.onkeydown = function(e) {
-	e = e || window.event;
-	if (e.keyCode == 37) {
-		img_prev();
-	} else if (e.keyCode == 39) {
-		img_next();
-	}
-};
+				return output;
+			}
 
-</script>
-<body onLoad="getImages();">
-<h1>Random Imgur image</h1>
-<div>Cache status: <span id="cache">0</span>.</div>
-<div id="a">Please wait...</div>
-</body>
+			function getImages() {
+				if (img_loading) return;
+				img_loading = true;
+				imgObject.src = "http://i.imgur.com/" + randomString(5) + ".jpg";
+				document.getElementById("input_max_cache").value = cache_length;
+			}
+
+			function img_next() {
+				// load next image
+				if (foundimgs.length == 0) return;
+				var img_data = foundimgs.shift();
+				historyimgs.push(img_data);
+				img_show(img_data);
+				document.getElementById("cache").innerHTML = foundimgs.length;
+				if (foundimgs.length < 25)
+					getImages();
+			}
+
+			function img_prev() {
+				// go one image back
+				if (historyimgs.length <= 1) return; // Can't go back
+				foundimgs.unshift(historyimgs.pop());
+				document.getElementById("cache").innerHTML = foundimgs.length;
+				img_show(historyimgs[historyimgs.length - 1]);
+			}
+
+			function img_show(data) {
+				var controls = "Tried "+data[0]+" times. ";
+
+				if (historyimgs.length > 1)
+					controls += "<a href=\"javascript:img_prev();\"><<<</a> ";
+
+				controls += "<a href=\"javascript:img_next();\">>>></a>";
+				var link = "<a href=\"" + data[1] + "\">" + data[1];
+				var html = "<img src=\"" + data[1] + "\" /></a>";
+
+				document.getElementById('a').innerHTML = html;
+				document.getElementById('controls').innerHTML = controls;
+				document.getElementById('link').innerHTML = link;
+			}
+
+			function updateCacheLength() {
+				cache_length = document.getElementById('input_max_cache').value;
+				getImages();
+			}
+
+			document.onkeydown = function(e) {
+				e = e || window.event;
+				if (e.keyCode == 37) {
+					img_prev();
+				} else if (e.keyCode == 39) {
+					img_next();
+				}
+			};
+		</script>
+	</head>
+		<body onLoad="getImages();">
+			<div id="topbar">
+				<div id="title">Random Imgur Image</div>
+				<div id="link"></div>
+				<div id="rightbar"><span id="controls"></span> Cache status: <span id="cache">0</span>/<input id="input_max_cache" name="max_cache" onChange="updateCacheLength();"></input></div>
+			</div>
+			<div id="a">Please wait...</div>
+		</body>
 </html>
